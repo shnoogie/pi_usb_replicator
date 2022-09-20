@@ -11,7 +11,9 @@ A Raspberry Pi tool for replication of bulk USB devices.
 
 # Installation <a name="install"></a>
 
-Before you start ensure everything is up to date.
+Before we start I must make it clear that security has been ignored in this setup and in some cases outright disabled. It is assumed this will only be hosted on a LAN. In some cases you can use a reverse proxy to expose to the internet, but even then there is risk in doing so.
+
+Ensure everything is up to date.
 
 `sudo apt update`
 
@@ -147,9 +149,61 @@ Now restart nginx and php.
 
 `sudo systemctl restart php8.1-fpm`
 
+Finally set the permissions for your web folder. Which will allow you to read and write as any user.
+
+`sudo chmod -R 777 /var/www/html`
+
 ## Tiny File Manager <a name="tfm"></a>
 
-https://tinyfilemanager.github.io
+First we'll make a directory we'll need later.
+
+`sudo mkdir -p /var/usb/data`
+
+Ensure you're at your users home directory, we'll use that as our working directory.
+
+`cd ~`
+
+For file managment we'll be using a web app called Tiny File Manager, which can be found at https://tinyfilemanager.github.io.
+
+Download their release to your working directory.
+
+`wget https://github.com/prasathmani/tinyfilemanager/archive/refs/tags/2.4.7.zip`
+
+Now unzip the file that was downloaded.
+
+`unzip 2.4.7.zip`
+
+Then we'll move the contents of the zip to our web directory.
+
+`cp -r tinyfilemanager-2.4.7/* /var/www/html`
+
+Tiny File Manager has been installed. You can check it out by going to **http://\<pi ip\>/tinyfilemanager.php**, however, we still need to configure it.
+
+Change to the web directory.
+
+`cd /var/www/html`
+
+Make Tiny File Manager the index.
+
+`cp tinyfilemanager.php index.php`
+
+Finally we'll need to configure Tiny File Manager. Start by opening the config file.
+
+`nano config.php`
+
+Make sure the config matches the following below. Don't copy and paste, scroll down the config and make changes to match what I have below.
+
+```
+$use_auth = false;
+$use_highlightjs = false;
+$edit_files = false;
+$root_path = '/var/usb/data/';
+$allowed_upload_extensions = 'gcode';
+$online_viewer = false;
+$max_upload_size_bytes = 5000000000000;
+```
+
+Awesome, we're done installing Tiny File Manager. You can check it out by going to **http://\<pi ip\>/**
 
 ## Device Syncing <a name="sync"></a>
 
