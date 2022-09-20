@@ -4,10 +4,18 @@ A Raspberry Pi tool for replication of bulk USB devices.
 
 * [Installation](#install)
   * [USB Automount](#usb)
+  * [Nginx/PHP](#web)
   * [Tiny File Manager](#tfm)
+  * [Device Syncing](#sync)
 * [Usage](#usage)
 
 # Installation <a name="install"></a>
+
+Before you start ensure everything is up to date.
+
+`sudo apt update`
+
+`sudo apt upgrade`
 
 ## USB Automount <a name="usb"></a>
 
@@ -60,9 +68,92 @@ Copy the contents of **autoumount.sh** in the git repository. Make sure the file
 
 `sudo chmod +x /usr/local/bin/autoumount.sh`
 
+## Nginx/PHP <a name="web"></a>
+
+Files will be managed over the web, to do so you'll need to install nginx and php which is a web server and scripting languge.
+
+We'll start with nginx.
+
+`sudo apt install nginx`
+
+Once it's finished check that's it's running by going to **http://\<pi ip\>**
+
+Next we'll install PHP which will have a few more steps.
+
+`sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg`
+
+`sudo sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'`
+
+`sudo apt update`
+
+`sudo apt install php8.1-common php8.1-fpm`
+
+Now you'll need to update nginx configuration to use php.
+
+Make the following edits:
+
+Under the following line
+
+```
+listen [::]:80 default_server;
+```
+
+Add the following line:
+
+```
+client_max_body_size 500M;
+```
+
+Change the line (or similar line):
+
+```
+index index.html index.htm index.nginx-debian.html;
+```
+
+to
+
+```
+index index.php index.html index.htm index.nginx-debian.html;
+```
+
+Uncomment the follow lines (remove the #):
+
+```
+location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+}
+```
+
+and
+
+```
+location ~ /\.ht {
+        deny all;
+}
+```
+
+Now need to make some changes to php.ini
+
+`sudo nano /etc/php/8.1/fpm/php.ini`
+
+Find the line **'upload_max_filesize'** and change it's value to 500M
+
+Find the line **'post_max_size'** and change it's value to 0
+
+Now restart nginx and php.
+
+`sudo systemctl restart nginx`
+
+`sudo systemctl restart php8.1-fpm`
+
 ## Tiny File Manager <a name="tfm"></a>
 
 https://tinyfilemanager.github.io
+
+## Device Syncing <a name="sync"></a>
+
+sudo apt install inotify-tools
 
 # Usage <a name="usage"></a>
 All USBs are mounted to /media/\<uuid\> of partition. The folders are deleted when the device is removed, to keep things neat.
