@@ -1,7 +1,10 @@
 # pi_usb_replicator
-A Raspberry Pi for replication of bulk USB devices.
+A Raspberry Pi tool for replication of bulk USB devices.
 
-# Installation
+1. [Installation](#install)
+2. [Usage](#usage)
+
+# Installation <a name="install"></a>
 Raspberry PI does not have exFAT installed by default. Make sure to install it.
 
 `sudo apt install exfat-fuse exfat-utils`
@@ -50,3 +53,6 @@ Next, create the script for when the USB is removed.
 Copy the contents of **autoumount.sh** in the git repository. Make sure the file is flagged for execution.
 
 `sudo chmod +x /usr/local/bin/autoumount.sh`
+
+# Usage <a name="usage"></a>
+All USBs are mounted to /media/\<uuid\> of partition. The folders are deleted when the device is removed, to keep things neat.
