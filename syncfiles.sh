@@ -6,6 +6,7 @@ PID_FILENAME="syncfiles"
 PID_PATH=/var/run/
 PID_FILE="${PID_PATH}${PID_FILENAME}.pid"
 DEVICE_RE="/media/*"
+PID_RE=syncfiles_*.pid
 
 echo "SYNC IN PROGRESS" | tee /dev/kmsg
 
@@ -23,7 +24,7 @@ full_sync () {
 		if [ "${PID_PATH}${PID_RE}" != "$FILE" ]
 		then
 			RUNNING_PID=`cat "$FILE"`
-			kill -n 9 $RUNNING_PID
+			pkill -P $RUNNING_PID
 			rm -f "$FILE"
 			echo "Killed $FILE" | tee /dev/kmsg
 		fi
