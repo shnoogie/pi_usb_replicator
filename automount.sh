@@ -18,6 +18,7 @@ mkdir /media/${UUID}
 if [ $? -eq 0 ]
 then
   echo "Mounted /dev/$PART to /media/$UUID" | tee /dev/kmsg
+  /usr/local/bin/syncfiles.sh "$UUID"
 else
   echo "Failed to mount /dev/$PART deleting /media/$UUID" | tee /dev/kmsg
   rm -fr /media/${UUID}
