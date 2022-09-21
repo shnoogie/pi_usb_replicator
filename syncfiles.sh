@@ -9,7 +9,7 @@ DEVICE_RE="/media/*"
 
 if test -f "$PID_FILE"
 then
-	echo "Another sync process running, exiting."
+	echo "Another sync process running, exiting." | tee /dev/kmsg
     exit 1
 fi
 
@@ -23,12 +23,14 @@ full_sync () {
 			RUNNING_PID=`cat "$FILE"`
 			kill -n 9 $RUNNING_PID
 			rm -f "$FILE"
+			echo "Killed $FILE" | tee /dev/kmsg
 		fi
 	done
 
 	for DEVICE in $DEVICE_RE; do
 		if [ "$DEVICE_RE" != "$DEVICE" ]
 		then
+			echo "Running rsync on ${DEVICE}" | tee /dev/kmsg
 			rsync -ac --delete "${SOURCE_DIRECTORY}" "${DEVICE}"
 		fi
 	done
@@ -42,17 +44,19 @@ targeted_sync () {
 
 	if test -f "$UUID_PID_FILE"
 	then
-		echo "Another sync process running for ${DEVICE_UUID}, exiting."
+		echo "Another sync process running for ${DEVICE_UUID}, exiting." | tee /dev/kmsg
     	exit 1
     elif test -f "$PID_FILE"
     then
-    	echo "Another sync process running, exiting."
+    	echo "Another sync process running, exiting." | tee /dev/kmsg
     	exit 1
 	fi
 
 	echo "$$" > "$UUID_PID_FILE"
 
 	rsync -ac --delete "${SOURCE_DIRECTORY}" "${MOUNT_PATH}"
+
+	echo "Running targeted rsync on ${DEVICE}" | tee /dev/kmsg
 
 	rm "${PID_PATH}${PID_FILENAME}_${DEVICE_UUID}.pid"
 }
