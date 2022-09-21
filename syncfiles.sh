@@ -33,9 +33,11 @@ full_sync () {
 		if [ "$DEVICE_RE" != "$DEVICE" ]
 		then
 			echo "Running rsync on ${DEVICE}" | tee /dev/kmsg
-			rsync -ac --delete "${SOURCE_DIRECTORY}" "${DEVICE}"
+			nohup rsync -ac --delete "${SOURCE_DIRECTORY}" "${DEVICE}" &
 		fi
 	done
+	
+	wait
 
 	rm "$PID_FILE"
 }
