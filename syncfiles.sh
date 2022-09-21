@@ -7,6 +7,8 @@ PID_PATH=/var/run/
 PID_FILE="${PID_PATH}${PID_FILENAME}.pid"
 DEVICE_RE="/media/*"
 
+echo "SYNC IN PROGRESS" | tee /dev/kmsg
+
 if test -f "$PID_FILE"
 then
 	echo "Another sync process running, exiting." | tee /dev/kmsg
@@ -39,25 +41,22 @@ full_sync () {
 }
 
 targeted_sync () {
-	UUID_PID_FILE="${PID_PATH}${PID_FILENAME}_${DEVICE_UUID}.pid"
-	MOUNT_PATH="/media/${DEVICE_UUID}"
+    UUID_PID_FILE="${PID_PATH}${PID_FILENAME}_${DEVICE_UUID}.pid"
+    MOUNT_PATH="/media/${DEVICE_UUID}"
 
-	if test -f "$UUID_PID_FILE"
-	then
-		echo "Another sync process running for ${DEVICE_UUID}, exiting." | tee /dev/kmsg
+    if test -f "$UUID_PID_FILE"
+    then
+	echo "Another sync process running for ${DEVICE_UUID}, exiting." | tee /dev/kmsg
     	exit 1
     elif test -f "$PID_FILE"
     then
     	echo "Another sync process running, exiting." | tee /dev/kmsg
     	exit 1
-	fi
+    fi
 
 	echo "$$" > "$UUID_PID_FILE"
-
 	rsync -ac --delete "${SOURCE_DIRECTORY}" "${MOUNT_PATH}"
-
-	echo "Running targeted rsync on ${DEVICE}" | tee /dev/kmsg
-
+	echo "Running targeted rsync on ${DEVICE_UUID}" | tee /dev/kmsg
 	rm "${PID_PATH}${PID_FILENAME}_${DEVICE_UUID}.pid"
 }
 
@@ -71,3 +70,5 @@ main () {
 }
 
 main
+
+echo "SYNC ENDED" | tee /dev/kmsg
