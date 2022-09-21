@@ -74,4 +74,8 @@ main () {
 
 main
 
-echo "SYNC ENDED" | tee /dev/kmsg
+
+if ! test -f "$PID_FILE"
+then
+	echo "SYNC ENDED" | tee /dev/kmsg
+fi
