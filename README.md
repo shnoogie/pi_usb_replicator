@@ -9,6 +9,13 @@ A Raspberry Pi tool for replication of bulk USB devices.
   * [Device Syncing](#sync)
 * [Usage](#usage)
 
+## To-Do
+
+- Clean up on boot and reboot ? may not be needed
+- Debugging
+- Logging
+- LED Status
+
 # Installation <a name="install"></a>
 
 Before we start I must make it clear that security has been ignored in this setup and in some cases outright disabled. It is assumed this will only be hosted on a LAN. In some cases you can use a reverse proxy to expose to the internet, but even then there is risk in doing so.
@@ -207,7 +214,68 @@ Awesome, we're done installing Tiny File Manager. You can check it out by going 
 
 ## Device Syncing <a name="sync"></a>
 
-sudo apt install inotify-tools
+Start by downloading the required dependencies.
+
+`sudo apt install inotify-tools`
+
+Next you'll need to add the firewatch script.
+
+`sudo nano /usr/local/bin/filewatch.sh`
+
+Copy the contents of **filewatch.sh** in the git repository. Make sure the file is flagged for execution.
+
+`chmod +x /usr/local/bin/filewatch.sh`
+
+Install the firewatch service.
+
+`sudo nano /etc/systemd/system/filewatch-sync.service`
+
+Copy the following to the script.
+
+```
+# /etc/systemd/system/filewatch-sync.service
+[Unit]
+Description=Filewatch Sync
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/filewatch.sh
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Run the following commands to activate the service.
+
+`sudo systemctl daemon-reload`
+
+`sudo systemctl enable filewatch-sync`
+
+`sudo systemctl start filewatch-sync`
+
+Check to see if the service is running without error.
+
+`sudo systemctl status filewatch-sync`
+
+Next you'll need to install the syncfiles script.
+
+`sudo nano /usr/local/bin/syncfiles.sh`
+
+Copy the contents of **syncfiles.sh** in the git repository. Make sure the file is flagged for execution.
+
+`sudo chmod +x /usr/local/bin/syncfiles.sh`
 
 # Usage <a name="usage"></a>
 All USBs are mounted to /media/\<uuid\> of partition. The folders are deleted when the device is removed, to keep things neat.
+
+You can add files by visiting the hosted web service. **http://\<pi ip\>
+
+Syncronization is triggered by two events.
+ 1. Changes in the source directory. (Main Sync)
+ 2. USB changes. (Targeted Sync)
+
+The first trigger takes presidence over all other running sync jobs. It will kill all other running targeted syncs and run a sync on all connected devices. This is threaded and each devices will run it's own process to prevent overly long sync jobs.
+
+The second trigger is targets a specific device when it's first plugged in.
