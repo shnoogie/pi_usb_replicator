@@ -267,6 +267,49 @@ Copy the contents of **syncfiles.sh** in the git repository. Make sure the file 
 
 `sudo chmod +x /usr/local/bin/syncfiles.sh`
 
+Time to install syncwatch.sh. This will control the LED which provides feedback of the sync status.
+
+`sudo nano /usr/local/bin/syncwatch.sh`
+
+Copy the contents of **syncwatch.sh** in the git repository. Make sure the file is flagged for execution.
+
+`sudo chmod +x /usr/local/bin/syncwatch.sh`
+
+Install the syncwatch service.
+
+`sudo nano /etc/systemd/system/syncwatch.service`
+
+Copy the following
+
+```
+# /etc/systemd/system/syncwatch.service
+[Unit]
+Description=Syncwatch Sync
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/syncwatch.sh
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Now start the service.
+
+`sudo systemctl daemon-reload`
+
+`sudo systemctl enable syncwatch`
+
+`sudo systemctl start syncwatch`
+
+Ensure the service is in running state.
+
+`sudo systemctl status syncwatch`
+
+Now ensure to plug the positve side of your LED into GPIO pin 4 and negative into ground.
+
 # Usage <a name="usage"></a>
 All USBs are mounted to /media/\<uuid\> of partition. The folders are deleted when the device is removed, to keep things neat.
 
