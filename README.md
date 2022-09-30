@@ -198,6 +198,12 @@ Make Tiny File Manager the index.
 
 Finally we'll need to configure Tiny File Manager. Start by opening the config file.
 
+Move the sample config to config.php.
+
+`mv config-sample.php config.php`
+
+Next edit the config.
+
 `nano config.php`
 
 Make sure the config matches the following below. Don't copy and paste, scroll down the config and make changes to match what I have below.
