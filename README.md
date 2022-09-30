@@ -99,6 +99,8 @@ Next we'll install PHP which will have a few more steps.
 
 Now you'll need to update nginx configuration to use php.
 
+`sudo nano /etc/nginx/sites-available/default`
+
 Make the following edits:
 
 Under the following line
