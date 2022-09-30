@@ -127,7 +127,7 @@ to
 index index.php index.html index.htm index.nginx-debian.html;
 ```
 
-Uncomment the follow lines (remove the #):
+Uncomment the follow lines (remove the #) ensure the lines you're uncommenting match what's here.:
 
 ```
 location ~ \.php$ {
@@ -167,6 +167,10 @@ Finally set the permissions for your web folder. Which will allow you to read an
 First we'll make a directory we'll need later.
 
 `sudo mkdir -p /var/usb/data`
+
+Change it's permissions
+
+`sudo chmod 777 /var/usb/data`
 
 Ensure you're at your users home directory, we'll use that as our working directory.
 
