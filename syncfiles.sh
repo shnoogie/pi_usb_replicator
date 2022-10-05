@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SOURCE_DIRECTORY=/var/usb/data/
-DEVICE_UUID=$1
+MOUNT_FOLDER=$1
 PID_FILENAME="syncfiles"
 PID_PATH=/var/run/
 PID_FILE="${PID_PATH}${PID_FILENAME}.pid"
@@ -44,12 +44,12 @@ full_sync () {
 }
 
 targeted_sync () {
-    UUID_PID_FILE="${PID_PATH}${PID_FILENAME}_${DEVICE_UUID}.pid"
-    MOUNT_PATH="/media/${DEVICE_UUID}"
+    UUID_PID_FILE="${PID_PATH}${PID_FILENAME}_${MOUNT_FOLDER}.pid"
+    MOUNT_PATH="/media/${MOUNT_FOLDER}"
 
     if test -f "$UUID_PID_FILE"
     then
-	echo "Another sync process running for ${DEVICE_UUID}, exiting." | tee /dev/kmsg
+	echo "Another sync process running for ${MOUNT_FOLDER}, exiting." | tee /dev/kmsg
     	exit 1
     elif test -f "$PID_FILE"
     then
@@ -59,12 +59,12 @@ targeted_sync () {
 
 	echo "$$" > "$UUID_PID_FILE"
 	rsync -ac --delete "${SOURCE_DIRECTORY}" "${MOUNT_PATH}"
-	echo "Running targeted rsync on ${DEVICE_UUID}" | tee /dev/kmsg
-	rm "${PID_PATH}${PID_FILENAME}_${DEVICE_UUID}.pid"
+	echo "Running targeted rsync on ${MOUNT_FOLDER}" | tee /dev/kmsg
+	rm "${PID_PATH}${PID_FILENAME}_${MOUNT_FOLDER}.pid"
 }
 
 main () {
-	if [ -z ${DEVICE_UUID} ]
+	if [ -z ${MOUNT_FOLDER} ]
 	then
 	    full_sync
 	else
