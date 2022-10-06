@@ -14,7 +14,6 @@ A Raspberry Pi tool for replication of bulk USB devices.
 - Clean up on boot and reboot ? may not be needed
 - Debugging
 - Logging
-- LED Status
 
 # Installation <a name="install"></a>
 
