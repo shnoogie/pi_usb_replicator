@@ -12,8 +12,10 @@ echo "SYNC IN PROGRESS" | tee /dev/kmsg
 
 if test -f "$PID_FILE"
 then
-	echo "Another sync process running, exiting." | tee /dev/kmsg
-    exit 1
+	echo "Another sync process running, killing it." | tee /dev/kmsg
+	RUNNING_PID=`cat "$PID_FILE"`
+	pkill -P $RUNNING_PID
+	rm -f $PID_FILE
 fi
 
 full_sync () {
@@ -51,10 +53,10 @@ targeted_sync () {
     then
 	echo "Another sync process running for ${MOUNT_FOLDER}, exiting." | tee /dev/kmsg
     	exit 1
-    elif test -f "$PID_FILE"
-    then
-    	echo "Another sync process running, exiting." | tee /dev/kmsg
-    	exit 1
+   # elif test -f "$PID_FILE"
+   # then
+   # 	echo "Another sync process running, exiting." | tee /dev/kmsg
+   # 	exit 1
     fi
 
 	echo "$$" > "$UUID_PID_FILE"
